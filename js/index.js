@@ -52,44 +52,91 @@ doms.multiRow.oninput = debounce(function (e) {
     }
 }, 500)
 
+doms.multiRow.onchange = function(e) {
+    var target = e.target
+    if (target.tagName === 'INPUT') {
+        if (target.getAttribute('name') === 'name') {
+            if (target.value) {
+                if (!target.parentElement.children[0].value) {
+                    return
+                }
+                if (confirm('选项的参数是否需要必传？')) {
+                    target.parentElement.children[2].value = 0
+                } else {
+                    target.parentElement.children[2].value = 1
+                }
+            }
+        }
+    }
+}
+
+
 doms.add.onclick = function () {
     // console.log(this, 'doms.add')
-    doms.multiRow.innerHTML += `
-                <div class="form-item">
-                    <div class="row">
-                        <input class="item" type="text"  name="opt"  title="选项" placeholder="选项">
-                        <input class="item" type="text"   name="name" title="变量名" placeholder="变量名">
-                        <input class="item" type="number"  name="isempty" title="是否可不传选项" placeholder="是否可不传选项" min="0" max="1" value="0">
-                        <input class="item" type="text"   name="desc" title="描述" placeholder="描述">
-                    </div>
-                    <button type="button" class="generate del">X</button>
-                    <p class="msg"></p>
-                </div>
-    `
+
+    var div = document.createElement('div')
+    div.className = 'form-item'
+    var row = document.createElement('div')
+    row.classList.add('row')
+    div.appendChild(row)
+    row_addinput(row,'item', 'opt', '选项', '')
+    row_addinput(row,'item', 'name', '变量名', '')
+    row_addinput(row,'item', 'isempty', '是否可不传选项', 0, true)
+    row_addinput(row,'item', 'desc', '描述', '')
+
+    var btn = document.createElement('button')
+    btn.type = 'button'
+    btn.className = 'generate del'
+    btn.innerText = 'X'
+    div.appendChild(btn)
+    
+    var p = document.createElement('p')
+    p.className = 'msg'
+    div.appendChild(p)
+
+    doms.multiRow.appendChild(div)
+}
+function row_addinput(row,className,name,title,value,disabled) {
+    var input = document.createElement('input')
+    input.className = className
+    input.name = name
+    input.title = title
+    input.placeholder = title
+    input.value = value
+    disabled && (input.disabled = true)
+    row.appendChild(input)
 }
 
 function validRow(row) {
     var err = ''
+    var val = null 
     for (var j = 0; j <= row.children.length - 1; j++) {
         var input = row.children[j]
+        val = input.value
         debugger
         if (input.name !== 'name' && input.name !== 'desc') {
-            if (input.value === '') {
+            if (val === '') {
                 err += `${input.name} 不可以为空;`
             }
         }
-
+        
         if (input.name === 'name') {
-            console.log('input.name', input.value);
-            if (input.value) {
-                if (!/^[^\d]\w+$/.test(input.value)) {
-                    console.log(input.value)
+            
+            if (val) {
+                console.log(input.parentElement.children[0].value,'>>>')
+                if (!input.parentElement.children[0].value) {
+                    input.value = ''
+                }
+                if (!/^[^\d]\w+$/.test(val)) {
                     err += `变量格式非数字开头，后面接0/1/多个字符(0-9a-zA-Z_);`
                 }
+                
+            } else {
+                input.parentElement.children[2].value = 1
             }
-
         } 
     }
+
     // console.log(err)
     var msg = row.parentElement.querySelector('.msg')
     msg.classList.add('err')
@@ -145,16 +192,25 @@ doms.generate.addEventListener('click', function () {
             vars += `\$${item.name} `
             description += `#${item.opt} 选项必须传递<br/>`
         } else {
-            defaults += `\: \${${item.name}:-默认值}`
-            description += `#${item.opt} 选项可以省略<br/>`
-            defaultsvars += `\$${item.name} `
+            // 说明给变量，选项有参数
+            if (item.name) {
+                defaults += `\: \${${item.name}:-默认值}`
+                description += `#${item.opt} 选项可以省略<br/>`
+                defaultsvars += `\$${item.name} `
+            } else {
+                // 没有变量，选项无参数
+                description += `#${item.opt} 选项可以省略，且是一个flag。省略为0,添加为1`
+
+                defaultsvars += `${item.opt} state: \$(getflag '${item.opt}') `
+            }
+
         }
     }
     if (vars) {
         vars = 'echo ' + vars
     }
     if (defaultsvars) {
-        defaultsvars = 'echo ' + defaultsvars
+        defaultsvars = `echo "${defaultsvars}"`
     }
     doms.content.innerHTML = ''
     doms.content.innerHTML += `
@@ -169,6 +225,5 @@ doms.generate.addEventListener('click', function () {
             <p>${vars}</p>
             <p>${defaults}</p>
             <p>${defaultsvars}</p>
-            <p>#getflag -d;  获取 -d flag的状态 1有。默认0没有。</p>
     `
 })

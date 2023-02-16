@@ -34,7 +34,6 @@ h1 {
     padding: 12px;
     border-radius: 11px;
     border: 1px solid #ccc;
-    user-select: none;
     font-weight: 100;
     font-size: 12px;
 }
