@@ -194,7 +194,7 @@ doms.generate.addEventListener('click', function () {
         } else {
             // 说明给变量，选项有参数
             if (item.name) {
-                defaults += `\: \${${item.name}:=默认值}`
+                defaults += `\: \${${item.name}:=默认值}<br/>`
                 description += `#${item.opt} 选项可以省略<br/>`
                 defaultsvars += `\$${item.name} `
             } else {
