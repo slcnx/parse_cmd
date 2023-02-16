@@ -72,15 +72,20 @@ function validRow(row) {
     var err = ''
     for (var j = 0; j <= row.children.length - 1; j++) {
         var input = row.children[j]
-        if (input.value === '') {
-            err += `${input.name} 不可以为空;`
+        debugger
+        if (input.name !== 'name' && input.name !== 'desc') {
+            if (input.value === '') {
+                err += `${input.name} 不可以为空;`
+            }
         }
 
         if (input.name === 'name') {
             console.log('input.name', input.value);
-            if (!/^[^\d]\w+$/.test(input.value)) {
-                console.log(input.value)
-                err += `变量格式非数字开头，后面接0/1/多个字符(0-9a-zA-Z_);`
+            if (input.value) {
+                if (!/^[^\d]\w+$/.test(input.value)) {
+                    console.log(input.value)
+                    err += `变量格式非数字开头，后面接0/1/多个字符(0-9a-zA-Z_);`
+                }
             }
 
         } 
