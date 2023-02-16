@@ -1,0 +1,124 @@
+.edit {
+    min-width: 577px;
+    margin-bottom: 50px;
+    /* margin: 100px auto; */
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.row {
+    display: grid;
+    /* grid-template: repeat(1, 100%)/repeat(1, 200px 180px 130px 200px); */
+    grid-template: repeat(1, 100%)/repeat(4, 25%);
+}
+
+
+.head {
+    margin-bottom: 12px;
+}
+
+.form-item .msg {
+    color: #f40;
+    opacity: 0;
+    height: 24px;
+}
+
+.form-item .msg.err {
+    opacity: 1;
+}
+
+.row .item {
+    padding: 12px;
+    border-radius: 11px;
+    border: 1px solid #ccc;
+    user-select: none;
+    font-weight: 100;
+    font-size: 12px;
+}
+
+
+.edit {
+    /* border: 1px dotted; */
+    position: relative;
+}
+
+.edit .add,
+.edit .generate {
+    width: 40px;
+    height: 40px;
+    font-size: 22px;
+    border: 1px solid;
+    text-align: center;
+    border-radius: 11px;
+    /* background-color: #00f; */
+    position: absolute;
+    bottom: -50px;
+    left: 50%;
+    transform: translate(-50%);
+    cursor: pointer;
+    user-select: none;
+}
+
+.edit .generate {
+    margin-left: 60px;
+    font-size: 12px;
+}
+
+.edit .add:hover,
+.edit .generate:hover {
+    background-color: #ccc;
+    border: 1px solid #f40;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 100vh;
+}
+
+.content {
+    min-width: 577px;
+    padding: 20px;
+    /* outline: 1px solid; */
+    border: 1px solid #ccc;
+    border-radius: 11px;
+    background-color: rgba(0, 0, 0, .5);
+}
+
+.form-item {
+    position: relative;
+}
+
+.form-item .del {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    bottom: 0;
+    left: auto;
+    margin: 0;
+    transform: translate(120%, -80%);
+}
+
+.content-panel {
+    position: relative;
+}
+
+.content-panel .copy {
+    position: absolute;
+    right: 0;
+    top: -22px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #f40;
+    user-select: none;
+    cursor: pointer;
+}
+
+.content-panel .copy:hover {
+    color: #ccc;
+}

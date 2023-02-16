@@ -1,0 +1,23 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+ul {
+    list-style: none;
+}
+
+input {
+    outline: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+html {
+    min-width: 1000px;
+    color: #000;
+    font: 16px/1.5 '\5b8b\4f53'
+}
