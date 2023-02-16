@@ -81,7 +81,7 @@ doms.add.onclick = function () {
     div.appendChild(row)
     row_addinput(row,'item', 'opt', '选项', '')
     row_addinput(row,'item', 'name', '变量名', '')
-    row_addinput(row,'item', 'isempty', '是否可不传选项', 0, true)
+    row_addinput(row,'item', 'isempty', '是否可不传选项', 0, false)
     row_addinput(row,'item', 'desc', '描述', '')
 
     var btn = document.createElement('button')
