@@ -6,7 +6,9 @@ var doms = {
     table: $('.table'),
     add: $('.control .add'),
     generate: $('.control .generate'),
-    consoleText: $('.console-text')
+    consoleText: $('.console-text'),
+    copy: $('.copy'),
+    copymsg: $('.copymsg'),
 }
 
 // col
@@ -34,6 +36,19 @@ function bindEvents() {
 
     // 点击生成脚本内容
     doms.generate.onclick = onGenerateContent
+
+    // 1键复制
+    doms.copy.onclick = function (e) {
+        text = doms.consoleText.innerText
+        if (!text) {
+            return
+        }
+        navigator.clipboard.writeText(text);
+        doms.copymsg.innerText = '复制成功'
+        setTimeout(function () {
+            doms.copymsg.innerText = ''
+        }, 1000)
+    }
 }
 
 function onGenerateContent(e) {
@@ -198,8 +213,7 @@ function add() {
     // create the delete button
     var button = document.createElement("button");
     button.setAttribute("type", "button");
-    button.classList.add("del");
-    button.textContent = "删除";
+    button.classList.add("del", 'iconfont','icon-shanchu');
     item5.appendChild(button)
 
     doms.table.appendChild(item1)
