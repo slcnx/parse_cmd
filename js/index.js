@@ -1,184 +1,57 @@
-function $(selector) {
-    return document.querySelector(selector)
+
+function $(cssSelector) {
+    return document.querySelector(cssSelector)
 }
-
-function $$(selector) {
-    return document.querySelectorAll(selector)
-}
-
-
 var doms = {
-    add: $('.add'),
-    generate: $('#generate'),
-    edit: $('.edit'),
-    multiRow: $('.multi-row'),
-    content: $('.content'),
-    copy: $('.copy')
+    table: $('.table'),
+    add: $('.control .add'),
+    generate: $('.control .generate'),
+    consoleText: $('.console-text')
 }
 
-doms.copy.onclick = function() {
-    text = doms.content.innerText
-    if (!text) {
-        return
-    }
-    navigator.clipboard.writeText(text);
-    doms.copy.innerText = '复制成功'
-    doms.copy.style.color = '#0f0'
-    setTimeout(function() {
-        doms.copy.style.color = ''
-        doms.copy.innerText = 'copy'
-    },1000)
-}
+// col
+var columnNums = 5
 
-doms.multiRow.onclick = function (e) {
-    var target = e.target
-    if (target.tagName === 'BUTTON') {
-        // console.log(target)
-        var row = target.parentElement
-        row.style.backgroundColor = 'rgba(0, 0, 0, .1)'
-        setTimeout(function () {
-            if (confirm('是否删除此行?')) {
-                row.remove()
-            } else {
-                row.style.backgroundColor = ''
-            }
-        }, 0)
-    }
+function init() {
+    // 添加1个
+    add()
+    bindEvents()
 }
-doms.multiRow.oninput = debounce(function (e) {
-    var target = e.target
-    if (target.tagName === 'INPUT') {
-        validRow(target.parentElement)
-    }
-}, 500)
+init()
 
-doms.multiRow.onchange = function(e) {
-    var target = e.target
-    if (target.tagName === 'INPUT') {
-        if (target.getAttribute('name') === 'name') {
-            if (target.value) {
-                if (!target.parentElement.children[0].value) {
-                    return
-                }
-                if (confirm('选项的参数是否需要必传？')) {
-                    target.parentElement.children[2].value = 0
-                } else {
-                    target.parentElement.children[2].value = 1
-                }
+function bindEvents() {
+    doms.add.onclick = add
+
+    // 删除点击事件 委托
+    doms.table.addEventListener('click', function (e) {
+        var target = e.target
+        if (target.tagName === 'BUTTON') {
+            if (target.classList.contains('del')) {
+                RowBtnDel(target)
             }
         }
-    }
+    })
+
+    // 点击生成脚本内容
+    doms.generate.onclick = onGenerateContent
 }
 
-
-doms.add.onclick = function () {
-    // console.log(this, 'doms.add')
-
-    var div = document.createElement('div')
-    div.className = 'form-item'
-    var row = document.createElement('div')
-    row.classList.add('row')
-    div.appendChild(row)
-    row_addinput(row,'item', 'opt', '选项', '')
-    row_addinput(row,'item', 'name', '变量名', '')
-    row_addinput(row,'item', 'isempty', '是否可不传选项', 0, false)
-    row_addinput(row,'item', 'desc', '描述', '')
-
-    var btn = document.createElement('button')
-    btn.type = 'button'
-    btn.className = 'generate del'
-    btn.innerText = 'X'
-    div.appendChild(btn)
-    
-    var p = document.createElement('p')
-    p.className = 'msg'
-    div.appendChild(p)
-
-    doms.multiRow.appendChild(div)
-}
-function row_addinput(row,className,name,title,value,disabled) {
-    var input = document.createElement('input')
-    input.className = className
-    input.name = name
-    input.title = title
-    input.placeholder = title
-    input.value = value
-    disabled && (input.disabled = true)
-    row.appendChild(input)
-}
-
-function validRow(row) {
-    var err = ''
-    var val = null 
-    for (var j = 0; j <= row.children.length - 1; j++) {
-        var input = row.children[j]
-        val = input.value
-        debugger
-        if (input.name !== 'name' && input.name !== 'desc') {
-            if (val === '') {
-                err += `${input.name} 不可以为空;`
-            }
-        }
-        
-        if (input.name === 'name') {
-            
-            if (val) {
-                console.log(input.parentElement.children[0].value,'>>>')
-                if (!input.parentElement.children[0].value) {
-                    input.value = ''
-                }
-                if (!/^[^\d]\w+$/.test(val)) {
-                    err += `变量格式非数字开头，后面接0/1/多个字符(0-9a-zA-Z_);`
-                }
-                
-            } else {
-                input.parentElement.children[2].value = 1
-            }
-        } 
-    }
-
-    // console.log(err)
-    var msg = row.parentElement.querySelector('.msg')
-    msg.classList.add('err')
-    msg.innerHTML = err
-    return !err
-}
-
-doms.generate.addEventListener('click', function () {
-    // console.log('generate')
-    var rows = $$('.edit .form-item')
+function onGenerateContent(e) {
+    // 第1行不要
+    var totalRow = (doms.table.children.length / columnNums) - 1
     var result = []
-    for (var i = 0; i <= rows.length - 1; i++) {
-        var row = rows[i].querySelector('.row')
-        // console.log(row, '---')
-        if (!validRow(row)) {
-            return
-        }
-        var obj = {}
-        for (var j = 0; j <= row.children.length - 1; j++) {
-            var input = row.children[j]
-            // console.log(input)
-            if (input.name === 'opt') {
-                obj.opt = input.value
-                continue
-            }
-            if (input.name === 'name') {
-                obj.name = input.value
-                continue
-            }
-            if (input.name === 'isempty') {
-                obj.isempty = parseFloat(input.value)
-                continue
-            }
-            if (input.name === 'desc') {
-                obj.desc = input.value
-                continue
-            }
-        }
-        result.push(obj)
+    for (var row = 1; row <= totalRow; row++) {
+        var currentRowVal = getRowChildsVal(row)
+        // console.log(currentRowVal);
+
+        result.push(currentRowVal)
     }
 
-    // console.log(result)
+    // 生成内容
+    generateConsoleText(result)
+}
+
+function generateConsoleText(result) {
     var txt = ''
     var vars = ''
     var defaults = ''
@@ -186,25 +59,25 @@ doms.generate.addEventListener('click', function () {
     var defaultsvars = ''
     for (var i = 0; i < result.length; i++) {
         var item = result[i]
-        txt += `<p>${item.opt}&nbsp;&nbsp;&nbsp;&nbsp;,${item.name}&nbsp;&nbsp;&nbsp;&nbsp;,${item.isempty}&nbsp;&nbsp;&nbsp;&nbsp;,${item.desc}</p>`
+        txt += `<p>${item.option}&nbsp;&nbsp;&nbsp;&nbsp;,${item.var}&nbsp;&nbsp;&nbsp;&nbsp;,${item.required ? 0 : 1}&nbsp;&nbsp;&nbsp;&nbsp;,${item.desc}</p>`
         // 非空，选项必须传递
-        if (!item.isempty) {
-            vars += `\$${item.name} `
-            description += `#${item.opt} 选项必须传递<br/>`
-        } else {
+        if (!item.required) {
             // 说明给变量，选项有参数
-            if (item.name) {
-                defaults += `\: \${${item.name}:=默认值}<br/>`
-                description += `#${item.opt} 选项可以省略<br/>`
-                defaultsvars += `\$${item.name} `
+            if (item.var) {
+                defaults += `\: \${${item.var}:=默认值}<br/>`
+                description += `#${item.option} 选项可以省略<br/>`
+                defaultsvars += `\$${item.var} `
             } else {
                 // 没有变量，选项无参数
-                description += `#${item.opt} 选项可以省略，且是一个flag。省略为0,添加为1`
+                description += `#${item.option} 选项可以省略，且是一个flag。省略为0,添加为1`
 
-                defaultsvars += `${item.opt} state: \$(getflag '${item.opt}') `
+                defaultsvars += `${item.option} state: \$(getflag '${item.option}') `
             }
-
+        } else {
+            vars += `\$${item.var} `
+            description += `#${item.option} 选项必须传递<br/>`
         }
+
     }
     if (vars) {
         vars = 'echo ' + vars
@@ -212,8 +85,8 @@ doms.generate.addEventListener('click', function () {
     if (defaultsvars) {
         defaultsvars = `echo "${defaultsvars}"`
     }
-    doms.content.innerHTML = ''
-    doms.content.innerHTML += `
+    doms.consoleText.innerHTML = ''
+    doms.consoleText.innerHTML += `
         <p>#描述: <br/> ${description}</p>
         <p>source <(curl -sSLf https://gitee.com/slcnx/tools/raw/master/parse_cmd.sh |     sed 's/\\r//g')</p>
             <p>CONFIG='</p>
@@ -226,4 +99,125 @@ doms.generate.addEventListener('click', function () {
             <p>${defaults}</p>
             <p>${defaultsvars}</p>
     `
-})
+}
+
+function getRow(item) {
+    return Array.prototype.indexOf.call(doms.table.children, item.parentElement) + 1
+}
+
+
+function RowBtnDel(target) {
+    var index = getRow(target)
+    var row = index / columnNums
+    var childs = getRowChilds(row - 1)
+    // console.log(childs)
+    for (var i = 0; i <= childs.length - 1; i++) {
+        childs[i].remove()
+    }
+}
+
+function getRowChilds(n) {
+    var doms = {
+        table: $('.table'),
+    }
+    n++
+    var max = n * columnNums
+    var currentRow = []
+    for (var i = max - (columnNums - 1); i <= max; i++) {
+        // i-1 哪个item
+        var item = doms.table.children[i - 1]
+        currentRow.push(item)
+    }
+    return currentRow
+}
+
+function getRowChildsVal(n) {
+    var doms = {
+        table: $('.table'),
+    }
+    n++
+    var max = n * columnNums
+    var currentRowVal = Object.create(null)
+    for (var i = max - (columnNums - 1); i <= max; i++) {
+        // i-1 哪个item
+        var item = doms.table.children[i - 1]
+        if (i === max - 2) {
+            var checkbox = item.querySelector('input')
+            currentRowVal[checkbox.name] = checkbox.checked
+        } else if (i === max) {
+            true
+        }
+        else {
+            var txt = item.querySelector('.txt')
+            currentRowVal[txt.name] = txt.value
+        }
+    }
+    return currentRowVal
+}
+
+
+
+function add() {
+    var item1 = document.createElement("div");
+    item1.classList.add("item");
+    // create the first input element
+    var input1 = document.createElement("input");
+    input1.setAttribute("type", "text");
+    input1.name = 'option'
+    input1.classList.add("txt");
+    item1.appendChild(input1);
+
+
+    var item2 = item1.cloneNode()
+    // create the second input element
+    var input2 = document.createElement("input");
+    input2.setAttribute("type", "text");
+    input2.classList.add("txt");
+    input2.name = 'var'
+    item2.appendChild(input2)
+
+    var item3 = item1.cloneNode()
+    // create the third input element (checkbox)
+    var checkbox = document.createElement("input");
+    checkbox.setAttribute("type", "checkbox");
+    checkbox.setAttribute("checked", "");
+    checkbox.classList.add("txt");
+    checkbox.name = 'required'
+    item3.appendChild(checkbox)
+
+
+
+    var item4 = item1.cloneNode()
+    // create the fourth element (textarea)
+    var textarea = document.createElement("textarea");
+    textarea.classList.add("txt");
+    textarea.name = 'desc'
+    item4.appendChild(textarea)
+
+    var item5 = item1.cloneNode()
+    // create the delete button
+    var button = document.createElement("button");
+    button.setAttribute("type", "button");
+    button.classList.add("del");
+    button.textContent = "删除";
+    item5.appendChild(button)
+
+    doms.table.appendChild(item1)
+    doms.table.appendChild(item2)
+    doms.table.appendChild(item3)
+    doms.table.appendChild(item4)
+    doms.table.appendChild(item5)
+
+    // 事件
+    function _checkRequired(e) {
+        if (input1.value && !input2.value) {
+            checkbox.checked = true
+        }
+    }
+
+    input1.onchange = _checkRequired
+    input2.onchange = _checkRequired
+    checkbox.onchange = _checkRequired
+    textarea.onchange = _checkRequired
+}
+

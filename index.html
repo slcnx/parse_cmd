@@ -4,49 +4,53 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>生成命令行解析</title>
+    <title>生成命令行解析shell脚本 - Leo Song</title>
+    <link rel="stylesheet" href="//at.alicdn.com/t/c/font_3913887_od6itwt7l6s.css">
     <link rel="stylesheet" href="./css/reset.css">
     <link rel="stylesheet" href="./css/index.css">
-
 </head>
 <body>
-    
     <div class="container">
-        <div class="edit">
-            <h1>命令行解析生成脚本头</h1>
-            <div class="head">
-                <div class="row">
-                    <div class="item">选项</div>
-                    <div class="item">变量</div>
-                    <div class="item">是否可选</div>
-                    <div class="item">描述</div>
-                </div>
-            </div>
-            <div class="multi-row">
-                <div class="form-item">
-                    <div class="row">
-                        <input class="item" type="text"  name="opt"  title="选项" placeholder="选项">
-                        <input class="item" type="text" name="name" title="变量名" placeholder="变量名">
-                        <input class="item" type="number"   name="isempty" title="是否可不传选项" placeholder="是否可不传选项" min="0" max="1" value="0">
-                        <input class="item" type="text"   name="desc" title="描述" placeholder="描述">
-                    </div>
-                    <button type="button" class="generate del">X</button>
-                    <p class="msg"></p>
-                </div>
-            </div>
-
-        <div class="add">+</div>
-        <button type="button"  class="generate" id="generate">生成</button>
-        </div>
-        <div class="content-panel">
+        <h1>命令行解析生成脚本头</h1>
+        <div class="desc">
+            <h2>描述信息</h2>
             <div class="content">
-            
+                            <p> <strong>选项处</strong>：1）-u 2) --username 3) -u|--username。<br>
+                <strong>变量处</strong> ：只要Linux内建变量不存在，均可以使用。优先级，内建变量优先级更高。 <br>
+                <strong>参数必传:</strong>
+            </p>
+            <ul>
+                <li>如果取消，只要你写了变量，且命令行没有给参数，变量为空。   没有写变量，通过内建的方法 $(getflag '-u|--username') 就可以获取传递flag的选项状态。0 未传递，1传递 </li>
+                <li>如果  --tcp-proxy [必传] 给代理服务器地址； -d [可以不传] 移除代理。这种情况只传递-d就可以了，脚本会要求传递 --tcp-proxy，我们可以全部将变量必传取消。 脚本中使用  check_empty TCP_PROXY 来检查是否存在。 </li>
+            </ul>
             </div>
-            <div class="copy">copy</div>
         </div>
-    </div>
-    <script src="./js/debounce.js"></script>
-    <script src="./js/index.js"></script>
+        <!-- 行排序，4列 -->
+        <div class="table">
+            <div class="item">选项</div>
+            <div class="item">变量</div>
+            <div class="item">参数必传</div>
+            <div class="item">描述</div>
+            <div class="item">操作</div>
 
+
+        </div>
+
+        <div class="control">
+            <button type="button" class="add">添加新的一行</button>
+            <button type="button" class="generate">生成脚本内容</button>
+        </div>
+
+
+        <div class="console-container">
+            <div class="console-text">
+            
+            </div><button  type="button"  class="copy">复制</button>
+        </div>
+
+
+    </div>
+
+    <script src="./js/index.js"></script>
 </body>
 </html>

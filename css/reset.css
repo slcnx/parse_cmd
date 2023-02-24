@@ -8,16 +8,26 @@ ul {
     list-style: none;
 }
 
-input {
+input,textarea{
     outline: none;
 }
 
 a {
     text-decoration: none;
+    color: inherit;
 }
 
+
+
 html {
-    min-width: 1000px;
     color: #000;
-    font: 16px/1.5 '\5b8b\4f53'
+    font: 16px/1.5 '\5b8b\4f53';
+}
+
+button {
+    font-family: inherit;
+}
+button:hover {
+    color: #fff;
+    box-shadow: 0 0 0 2px #fff, 0 0 5px 4px #000;
 }
